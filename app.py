@@ -2,11 +2,10 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import os
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'app.sqlite')
@@ -33,11 +32,13 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 @app.route('/')
+@cross_origin()
 def hello():
     return "Hey Flask"
     return "Whats up"
 
 @app.route('/user', methods=["POST"])
+@cross_origin()
 def add_user():
     username = request.json['username']
     password = request.json['password']
@@ -53,17 +54,20 @@ def add_user():
     return user_schema.jsonify(user)
 
 @app.route("/users", methods=["GET"])
+@cross_origin()
 def get_users():
     all_users = User.query.all()
     result = users_schema.dump(all_users)
     return jsonify(result)
 
 @app.route("/user/<id>", methods=["GET"])
+@cross_origin()
 def get_user(id):
     user = User.query.get(id)
     return user_schema.jsonify(user)
 
 @app.route("/user/<id>", methods=["DELETE"])
+@cross_origin()
 def user_delete(id):
     user = User.query.get(id)
     db.session.delete(user)
