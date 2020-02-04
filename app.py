@@ -7,7 +7,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '9OLWxalrightND4o83j4K4iuopO'
+app.config['SECRET_KEY'] = 'thiswillbesecretkey'
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'user.db')
 db = SQLAlchemy(app)
@@ -41,6 +41,7 @@ def hello():
     return "Whats up"
 
 @app.route('/signup', methods=['POST'])
+@cross_origin()
 def signup_post():
 
     usern = request.form.get('username')
@@ -61,6 +62,7 @@ def signup_post():
     return ('created')
 
 @app.route('/login', methods=["POST"])
+@cross_origin()
 def login():
     username = request.form.get('username')
     password = request.form.get('password')
