@@ -12,6 +12,13 @@ marshmallow-sqlalchemy = "*"
 flask-migrate = "*"
 gunicorn = "*"
 flask-cors = "*"
+flask-bcrypt = "*"
+flask-ext = "*"
+flask-login = "*"
+passlib = {extras = ["bcrypt"],version = "*"}
+flask = "*"
+flask-httpauth = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"
