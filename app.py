@@ -61,7 +61,7 @@ def signup_post():
 
     return ('created')
 
-@app.route('/login', methods=["POST"])
+@app.route('/login', methods=["GET", "POST"])
 @cross_origin()
 def login():
     username = request.form.get('username')
