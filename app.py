@@ -5,6 +5,7 @@ from flask_login import UserMixin, login_user, logout_user, login_required, Logi
 from flask_cors import CORS, cross_origin
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'thiswillbesecretkey'
@@ -39,34 +40,42 @@ users_schema = UserSchema(many=True)
 def hello():
     return "Hey Flask"
     return "Whats up"
+    
+def set_default(obj):
+    if isinstance(obj, set):
+        return list(obj)
+    raise TypeError
 
 @app.route('/signup', methods=['POST'])
 @cross_origin()
 def signup_post():
+    
+    username = request.json.get('username')
+    password = request.json.get('password')
 
-    usern = request.form.get('username')
-    password = request.form.get('password')
+#  User.query.filter_by(username=username).first()
 
-    user = User.query.filter_by(username=usern).first() # if this returns a user, then the email already exists in database
+    if username is None or password is None:
+        abort(400)
 
-    if user: # if a user is found, we want to redirect back to signup page so user can try again  
-        return ("User Exsists")
+    if  User.query.filter_by(username=username).first() is not None:
+        abort(400)
 
-    # create new user with the form data. Hash the password so plaintext version isn't saved.
-    new_user = User(username=usern, password=generate_password_hash(password, method='sha256'))
+    
+    new_user = User(username=username, password=generate_password_hash(password, method='sha256'))
 
-    # add the new user to the database
     db.session.add(new_user)
     db.session.commit()
 
-    return ('created')
+    return jsonify({'username': new_user.username })    
 
 @app.route('/login', methods=["GET", "POST"])
 @cross_origin()
 def login():
-    username = request.form.get('username')
-    password = request.form.get('password')
-    remember = True if request.form.get('remember') else False
+    
+    username = request.json.get('username')
+    password = request.json.get('password')
+    remember = True if request.json.get('remember') else False
 
     user = User.query.filter_by(username=username).first()
 
@@ -75,7 +84,7 @@ def login():
 
     # if the above check passes, then we know the user has the right credentials
     login_user(user, remember=remember)
-    return('correct.credentials')
+    return('correct credentials')
 
     # username = request.json['username']
     # password = request.json['password']
